@@ -11,7 +11,7 @@ build-wallet *features:
     ./add-worker-module.sh
 
 build-keys *features:
-    cd crates/webzjs-keys && wasm-pack build -t web --release --scope zcashcommunitygrants --out-dir ../../packages/webzjs-keys --no-default-features --features="{{features}}" -Z build-std="panic_abort,std"
+    cd crates/webzjs-keys && wasm-pack build -t web --release --scope zcashcommunitygrants --out-dir ../../packages/webzjs-keys --no-default-features --features="multicore {{features}}" -Z build-std="panic_abort,std"
 
 build-requests *features:
     cd crates/webzjs-requests && wasm-pack build -t web --release --scope zcashcommunitygrants --out-dir ../../packages/webzjs-requests --no-default-features --features="{{features}}" -Z build-std="panic_abort,std"
