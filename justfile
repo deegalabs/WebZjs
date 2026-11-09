@@ -10,6 +10,16 @@ build-wallet *features:
     cd crates/webzjs-wallet && wasm-pack build -t web --release --scope zcashcommunitygrants --out-dir ../../packages/webzjs-wallet --no-default-features --features="wasm wasm-parallel {{features}}" -Z build-std="panic_abort,std"
     ./add-worker-module.sh
 
+# Single-threaded wallet: no SharedArrayBuffer, so the page needs no COOP/COEP headers.
+# RUSTFLAGS="" overrides the atomics flags of .cargo/config.toml; no -Z build-std is needed.
+# add-worker-module.sh is not run: there is no wasm_thread snippet in this flavour.
+build-wallet-single *features:
+    cd crates/webzjs-wallet && RUSTFLAGS="" wasm-pack build -t web --release --scope zcashcommunitygrants --out-dir ../../packages/webzjs-wallet-single --no-default-features --features="wasm no-threads {{features}}"
+
+# Checks the no-threads feature graph; pass a built .wasm to also check for shared memory and atomics.
+check-no-threads *wasm:
+    ./scripts/check-no-threads.sh {{wasm}}
+
 build-keys *features:
     cd crates/webzjs-keys && wasm-pack build -t web --release --scope zcashcommunitygrants --out-dir ../../packages/webzjs-keys --no-default-features --features="multicore {{features}}" -Z build-std="panic_abort,std"
 
