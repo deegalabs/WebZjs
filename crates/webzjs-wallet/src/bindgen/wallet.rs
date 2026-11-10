@@ -65,7 +65,7 @@ pub type NoteRef = <MemoryWalletDb<Network> as InputSource>::NoteRef;
 /// The wallet can be synchronized with the blockchain by calling the `sync` method. This will fetch compact blocks from the connected lightwalletd instance and scan them for transactions.
 /// The sync method uses a built-in strategy to determine which blocks is needs to download and scan in order to gain full knowledge of the balances for all accounts that are managed.
 ///
-/// Syncing is a long running process and so is delegated to a WebWorker to prevent from blocking the main thread. It is safe to call other methods on the wallet during syncing although they may take
+/// Syncing is a long running process. In the `wasm-parallel` build it is delegated to a WebWorker to prevent from blocking the main thread; in the `no-threads` build it runs in the caller's context, so host the wallet in your own Worker. It is safe to call other methods on the wallet during syncing although they may take
 /// longer than usual while they wait for a write-lock to be released.
 ///
 /// ```javascript
@@ -272,6 +272,7 @@ impl WebWallet {
     /// IMPORTANT: This build has no threads, so no worker is spawned: the sync runs in the context of the caller
     /// until it completes. Host the `WebWallet` in your own dedicated Worker to keep the page responsive.
     /// Certain wallet methods may temporarily block while the wallet is being written to during the sync.
+    /// A panic during the sync cannot be caught as an `Error` in this build (the wasm module aborts); in the threaded build it is reported as `Error::Sync`.
     ///
     #[cfg(not(feature = "wasm-parallel"))]
     pub async fn sync(&self) -> Result<(), Error> {
@@ -398,8 +399,7 @@ impl WebWallet {
 
         let txids = db
             .create_proposed_transactions(proposal.into(), &usk)
-            .await
-            .unwrap_throw();
+            .await?;
 
         let flattened_txid_bytes = txids.iter().flat_map(|&x| x.as_ref().clone()).collect();
         Ok(flattened_txid_bytes)
