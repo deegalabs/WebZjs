@@ -49,3 +49,7 @@ jobs:
 
       - name: Check the no-threads feature graph
         run: ./scripts/check-no-threads.sh
+
+      - name: Type-check the no-threads flavour for wasm32
+        working-directory: crates/webzjs-wallet
+        run: RUSTFLAGS="" cargo check --lib --target wasm32-unknown-unknown --no-default-features --features "wasm no-threads"
