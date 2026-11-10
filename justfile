@@ -13,8 +13,11 @@ build-wallet *features:
 # Single-threaded wallet: no SharedArrayBuffer, so the page needs no COOP/COEP headers.
 # RUSTFLAGS="" overrides the atomics flags of .cargo/config.toml; no -Z build-std is needed.
 # add-worker-module.sh is not run: there is no wasm_thread snippet in this flavour.
+# The generated package is renamed to @zcashcommunitygrants/webzjs-wallet-single.
 build-wallet-single *features:
     cd crates/webzjs-wallet && RUSTFLAGS="" wasm-pack build -t web --release --scope zcashcommunitygrants --out-dir ../../packages/webzjs-wallet-single --no-default-features --features="wasm no-threads {{features}}"
+    # same crate name as the threaded package; yarn refuses two workspaces with one name
+    node -e "const f='packages/webzjs-wallet-single/package.json',p=JSON.parse(require('fs').readFileSync(f));p.name=p.name.replace(/(-single)?$/,'-single');require('fs').writeFileSync(f,JSON.stringify(p,null,2))"
 
 # Checks the no-threads feature graph; pass a built .wasm to also check for shared memory and atomics.
 check-no-threads *wasm:
