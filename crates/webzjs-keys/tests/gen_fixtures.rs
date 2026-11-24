@@ -615,4 +615,17 @@ fn generate_fixtures() {
         90_000,
     );
     write_fixture("turnstile_migration", &turnstile);
+
+    // zip2009_fee_2000: an Ironwood payment of 98_000 from a 100_000 note, so the
+    // fee is 2_000, the ZIP 2009 minimum fee: one logical action (the extra
+    // action the builder adds is not counted), under the ZIP 317 grace of two actions, at the
+    // marginal fee of 1_000 from Mainnet block 3,590,000. Generated last so the
+    // RNG sequence of every fixture above is unchanged.
+    let zip2009 = make_ironwood_pczt(
+        &mut rng,
+        &our,
+        100_000,
+        &[(Some(our_ext_ovk.clone()), bridge_addr, 98_000)],
+    );
+    write_fixture("zip2009_fee_2000", &zip2009);
 }
