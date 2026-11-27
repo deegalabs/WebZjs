@@ -1,0 +1,48 @@
+[package]
+name = "stall"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+# Standalone: not part of the WebZjs workspace.
+[workspace]
+
+[dependencies]
+webzjs-wallet = { path = "../../crates/webzjs-wallet" }
+webzjs-common = { path = "../../crates/webzjs-common" }
+zcash_client_backend = { version = "0.24.0-rc.1", default-features = false, features = ["sync", "lightwalletd-tonic", "orchard"] }
+zcash_client_memory = { git = "https://github.com/sqhell/zcash_client_memory", rev = "e15c962dd84f59b27c06f41a52d89366846dc7be", features = ["orchard", "transparent-inputs"] }
+zcash_keys = { version = "0.15.0", features = ["transparent-inputs", "orchard", "sapling", "unstable"] }
+zip32 = "0.2"
+tonic = { version = "0.14", default-features = false, features = ["channel", "tls-ring", "tls-webpki-roots", "gzip"] }
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "time", "net", "io-util"] }
+
+[[bin]]
+name = "stall"
+path = "src/stall.rs"
+
+[patch.crates-io]
+# NU6.3: redirect the librustzcash family to upstream main rev 0a2c6d1a (release-candidate versions;
+# carries Nu6_3 = 0x37a5_165b, testnet activation 4,134,000, mainnet activation 3,428,143 - both
+# finalized, and the Ironwood wallet layer: Signer::sign_ironwood, Verifier::with_ironwood,
+# IronwoodDomain scanning). This rev MUST match the rev pinned by the red-dev-inc/zcash_client_memory
+# fork, or cargo builds two zcash_primitives -> trait mismatches.
+#
+# orchard: main patches orchard to the ZIP-374 deferred-anchor-builder branch (rev 3bd2b736, still
+# version 0.15.0). We MUST mirror this exact patch, or our crates pull orchard 0.15.0 from crates.io
+# while librustzcash pulls the git rev -> two `orchard` versions -> trait mismatch. Drop once it lands
+# in an orchard release.
+orchard              = { git = "https://github.com/zcash/orchard.git", rev = "3bd2b736d1273226595773265313fc3f3428af16" }
+equihash             = { git = "https://github.com/sqhell/librustzcash", rev = "b7b65fe3310eb4c8420469c48303c07ded6a74d5" }
+zcash_address        = { git = "https://github.com/sqhell/librustzcash", rev = "b7b65fe3310eb4c8420469c48303c07ded6a74d5" }
+zcash_client_backend = { git = "https://github.com/sqhell/librustzcash", rev = "b7b65fe3310eb4c8420469c48303c07ded6a74d5" }
+zcash_client_sqlite  = { git = "https://github.com/sqhell/librustzcash", rev = "b7b65fe3310eb4c8420469c48303c07ded6a74d5" }
+zcash_encoding       = { git = "https://github.com/sqhell/librustzcash", rev = "b7b65fe3310eb4c8420469c48303c07ded6a74d5" }
+zcash_keys           = { git = "https://github.com/sqhell/librustzcash", rev = "b7b65fe3310eb4c8420469c48303c07ded6a74d5" }
+zcash_protocol       = { git = "https://github.com/sqhell/librustzcash", rev = "b7b65fe3310eb4c8420469c48303c07ded6a74d5" }
+zip321               = { git = "https://github.com/sqhell/librustzcash", rev = "b7b65fe3310eb4c8420469c48303c07ded6a74d5" }
+zcash_primitives     = { git = "https://github.com/sqhell/librustzcash", rev = "b7b65fe3310eb4c8420469c48303c07ded6a74d5" }
+zcash_proofs         = { git = "https://github.com/sqhell/librustzcash", rev = "b7b65fe3310eb4c8420469c48303c07ded6a74d5" }
+pczt                 = { git = "https://github.com/sqhell/librustzcash", rev = "b7b65fe3310eb4c8420469c48303c07ded6a74d5" }
+zcash_transparent    = { git = "https://github.com/sqhell/librustzcash", rev = "b7b65fe3310eb4c8420469c48303c07ded6a74d5" }
+
