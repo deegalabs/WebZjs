@@ -1,0 +1,48 @@
+[package]
+name = "birthday-lock-stall"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+# Standalone: not part of the WebZjs workspace.
+[workspace]
+
+[dependencies]
+webzjs-wallet = { path = "../../crates/webzjs-wallet" }
+webzjs-common = { path = "../../crates/webzjs-common" }
+zcash_client_backend = { version = "=0.25.0", default-features = false, features = ["sync", "lightwalletd-tonic", "orchard", "zeroize"] }
+zcash_client_memory = { git = "https://github.com/red-dev-inc/zcash_client_memory", rev = "b4c8f0d33c65c5bab4155ddeba4f201ea2d28c43", features = ["orchard", "transparent-inputs"] }
+# unstable-frost only adds constructors; it is needed to build an Orchard-only UFVK in `leak`.
+zcash_keys = { version = "=0.17.0", features = ["transparent-inputs", "orchard", "sapling", "unstable", "unstable-frost"] }
+zcash_protocol = { version = "=0.11.0", default-features = false }
+zcash_primitives = { version = "=0.31.0" }
+zip32 = "0.3"
+tonic = { version = "0.14", default-features = false, features = ["channel", "tls-ring", "tls-webpki-roots", "gzip"] }
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "time", "net", "io-util"] }
+http = "1"
+http-body = "1"
+http-body-util = "0.1"
+bytes = "1"
+prost = "0.14"
+tower-service = "0.3"
+bip0039 = "0.12"
+
+[patch.crates-io]
+# Same patch as the WebZjs workspace at this commit.
+tonic-web-wasm-client = { path = "../../vendor/tonic-web-wasm-client" }
+
+[[bin]]
+name = "lock"
+path = "src/lock.rs"
+[[bin]]
+name = "leak"
+path = "src/leak.rs"
+[[bin]]
+name = "none"
+path = "src/none.rs"
+[[bin]]
+name = "birthday"
+path = "src/birthday.rs"
+[[bin]]
+name = "stall"
+path = "src/stall.rs"
