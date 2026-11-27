@@ -1,0 +1,8 @@
+<!doctype html><meta charset="utf-8"><title>trap check</title>
+<script type="module">
+const q = new URLSearchParams(location.search);
+window.state = { isolated: self.crossOriginIsolated, log: [], done: false };
+const w = new Worker("./worker.js?" + q.toString(), { type: "module" });
+w.onmessage = (e) => { window.state.log.push(e.data); if (e.data.final) window.state.done = true; };
+w.onerror = (e) => { window.state.log.push({ stage: "worker-onerror", msg: e.message }); window.state.done = true; };
+</script>

@@ -1,0 +1,9 @@
+{
+  "name": "worker-assert",
+  "version": "1.0.0",
+  "description": "sync() inside a Web Worker, threaded and no-threads builds",
+  "type": "commonjs",
+  "dependencies": {
+    "playwright-core": "^1.65.1"
+  }
+}
